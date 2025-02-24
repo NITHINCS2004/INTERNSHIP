@@ -1,4 +1,4 @@
-/*import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Feed.css'
 import { Link } from 'react-router-dom'
 import { API_KEY, value_converter } from '../../data'
@@ -35,7 +35,8 @@ const Feed = ({category}) => {
 }
 
 export default Feed
-*/
+
+/*
 import React, { useEffect, useState } from 'react';
 import './Feed.css';
 import { Link } from 'react-router-dom';
@@ -93,3 +94,4 @@ const Feed = ({ category }) => {
 };
 
 export default Feed;
+*/
