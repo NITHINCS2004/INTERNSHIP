@@ -54,16 +54,16 @@ const Feed = ({ category }) => {
     };
     fetchData();
 
-    // Get current hour in 12-hour format
+    // Get current hour and determine theme
     const now = new Date();
     const hours = now.getHours();
-    const isAM = now.getHours() < 12; // AM or PM check
+    const isAM = hours < 12;
 
     // Apply Light theme only between 10 AM - 12 PM
     if (isAM && hours >= 10 && hours < 12) {
       setTheme("light");
     } else {
-      setTheme("dark");
+      setTheme("dim-dark");
     }
   }, [category]);
 
@@ -76,8 +76,8 @@ const Feed = ({ category }) => {
         gridColumnGap: "16px",
         gridRowGap: "30px",
         marginTop: "15px",
-        backgroundColor: theme === "light" ? "#ffffff" : "#121212", // Feed section background
-        color: theme === "light" ? "#000000" : "#ffffff", // Text color
+        backgroundColor: theme === "light" ? "#ffffff" : "#181818", // Background color
+        color: theme === "light" ? "#000000" : "#b0b0b0", // Default text color
         padding: "20px",
         transition: "all 0.3s ease",
       }}
@@ -88,8 +88,8 @@ const Feed = ({ category }) => {
           to={`video/${item.snippet.categoryId}/${item.id}`}
           className="card"
           style={{
-            backgroundColor: theme === "light" ? "#f9f9f9" : "#222222", // Card background
-            color: theme === "light" ? "#000000" : "#ffffff", // Card text color
+            backgroundColor: theme === "light" ? "#f9f9f9" : "#242424", // Card Background
+            color: theme === "light" ? "#000000" : "#b0b0b0", // Default text color
             padding: "10px",
             borderRadius: "8px",
             textDecoration: "none",
@@ -104,19 +104,32 @@ const Feed = ({ category }) => {
               borderRadius: "5px",
             }}
           />
-          <h2 style={{ fontSize: "16px", fontWeight: "600" }}>
+          <h2
+            style={{
+              fontSize: "16px",
+              fontWeight: "600",
+              color: theme === "light" ? "#000000" : "#ffcc00", // Gold for Dark Mode
+              marginBottom: "5px",
+            }}
+          >
             {item.snippet.title}
           </h2>
           <h3
             style={{
               fontSize: "14px",
               fontWeight: "600",
-              color: theme === "light" ? "#555" : "#aaa",
+              color: theme === "light" ? "#555" : "#80cbc4", // Cyan for Dark Mode
+              marginBottom: "6px",
             }}
           >
             {item.snippet.channelTitle}
           </h3>
-          <p style={{ fontSize: "14px" }}>
+          <p
+            style={{
+              fontSize: "14px",
+              color: theme === "light" ? "#000000" : "#b0b0b0", // Light Gray for Dark Mode
+            }}
+          >
             {value_converter(item.statistics.viewCount)} Views &bull;
             {" " + moment(item.snippet.publishedAt).fromNow()}
           </p>
