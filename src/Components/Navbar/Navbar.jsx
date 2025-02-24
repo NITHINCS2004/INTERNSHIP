@@ -39,7 +39,7 @@ const Navbar = ({ setSidebar }) => {
 
 export default Navbar
 */
-/*
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import menu_icon from '../../assets/menu.png';
@@ -149,82 +149,6 @@ const Navbar = ({ setSidebar }) => {
                 <img src={more_icon} alt="" style={{ width: "25px", marginRight: "25px" }} />
                 <img src={notification_icon} alt="" style={{ width: "25px", marginRight: "25px" }} />
                 <img src={jack_img} alt="" style={userIconStyles} />
-            </div>
-        </nav>
-    );
-};
-
-export default Navbar;
-*/
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import menu_icon from '../../assets/menu.png';
-import logo from '../../assets/logo.png';
-import search_icon from '../../assets/search.png';
-import upload_icon from '../../assets/upload.png';
-import more_icon from '../../assets/more.png';
-import notification_icon from '../../assets/notification.png';
-import jack_img from '../../assets/jack.png';
-
-const Navbar = ({ setSidebar }) => {
-    const [theme, setTheme] = useState("dark");
-    const [timePeriod, setTimePeriod] = useState("");
-
-    useEffect(() => {
-        const fetchLocationAndSetTheme = async () => {
-            try {
-                const response = await fetch("https://ipapi.co/json/");
-                const data = await response.json();
-
-                const statesSouthIndia = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana"];
-                const userState = data.region;
-
-                const currentHour = new Date().getHours();
-                const isSouthIndia = statesSouthIndia.includes(userState);
-                const isWhiteThemeTime = currentHour >= 10 && currentHour < 12;
-
-                const newTheme = isSouthIndia && isWhiteThemeTime ? "light" : "dark";
-                setTheme(newTheme);
-
-                // ✅ Correct AM/PM logic
-                setTimePeriod(currentHour >= 12 ? "PM" : "AM");
-
-            } catch (error) {
-                console.error("Error fetching location data:", error);
-                setTheme("dark");
-                setTimePeriod(new Date().getHours() >= 12 ? "PM" : "AM"); // Default fallback
-            }
-        };
-
-        fetchLocationAndSetTheme();
-    }, []);
-
-    const sidebar_toggle = () => {
-        setSidebar((prev) => !prev);
-    };
-
-    return (
-        <nav className={`navbar ${theme}`}>
-            <div className="nav-left">
-                <img src={menu_icon} alt="Menu" className="menu-icon" onClick={sidebar_toggle} />
-                <Link to='/'>
-                    <img src={logo} alt="Logo" className="logo" />
-                </Link>
-            </div>
-
-            <div className="nav-middle">
-                <div className="search-container">
-                    <input type="text" placeholder="Search" className="search-input" />
-                    <img src={search_icon} alt="Search" className="search-icon" />
-                </div>
-                <span className="time-period">{timePeriod}</span>
-            </div>
-
-            <div className="nav-right">
-                <img src={upload_icon} alt="Upload" className="nav-icon" />
-                <img src={more_icon} alt="More" className="nav-icon" />
-                <img src={notification_icon} alt="Notifications" className="nav-icon" />
-                <img src={jack_img} alt="User" className="user-icon" />
             </div>
         </nav>
     );
