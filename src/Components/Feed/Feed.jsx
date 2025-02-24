@@ -76,8 +76,9 @@ const Feed = ({ category }) => {
         gridColumnGap: "16px",
         gridRowGap: "30px",
         marginTop: "15px",
-        backgroundColor: theme === "light" ? "#ffffff" : "#181818", // Background color
-        color: theme === "light" ? "#000000" : "#b0b0b0", // Default text color
+        background: theme === "light" 
+          ? "linear-gradient(to bottom, #ffffff, #f0f0f0)" 
+          : "linear-gradient(to bottom, #1e1e1e, #121212)", // Gradient Background
         padding: "20px",
         transition: "all 0.3s ease",
       }}
@@ -89,11 +90,13 @@ const Feed = ({ category }) => {
           className="card"
           style={{
             backgroundColor: theme === "light" ? "#f9f9f9" : "#242424", // Card Background
-            color: theme === "light" ? "#000000" : "#b0b0b0", // Default text color
-            padding: "10px",
-            borderRadius: "8px",
+            padding: "15px",
+            borderRadius: "10px",
             textDecoration: "none",
             transition: "all 0.3s ease",
+            boxShadow: theme === "light" 
+              ? "0px 4px 6px rgba(0, 0, 0, 0.1)" 
+              : "0px 4px 10px rgba(0, 0, 0, 0.6)", // Shadow effect
           }}
         >
           <img
@@ -101,15 +104,20 @@ const Feed = ({ category }) => {
             alt=""
             style={{
               width: "100%",
-              borderRadius: "5px",
+              borderRadius: "8px",
             }}
           />
           <h2
             style={{
-              fontSize: "16px",
-              fontWeight: "600",
-              color: theme === "light" ? "#000000" : "#ffcc00", // Gold for Dark Mode
+              fontSize: "17px",
+              fontWeight: "700",
+              background: theme === "light"
+                ? "none"
+                : "linear-gradient(to right, #00c6ff, #0072ff)", // Gradient Text in Dark Mode
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: theme === "light" ? "#000000" : "transparent", // Text Color
               marginBottom: "5px",
+              textTransform: "capitalize",
             }}
           >
             {item.snippet.title}
@@ -118,7 +126,7 @@ const Feed = ({ category }) => {
             style={{
               fontSize: "14px",
               fontWeight: "600",
-              color: theme === "light" ? "#555" : "#80cbc4", // Cyan for Dark Mode
+              color: theme === "light" ? "#333" : "#bb86fc", // Purple in Dark Mode
               marginBottom: "6px",
             }}
           >
@@ -127,7 +135,7 @@ const Feed = ({ category }) => {
           <p
             style={{
               fontSize: "14px",
-              color: theme === "light" ? "#000000" : "#b0b0b0", // Light Gray for Dark Mode
+              color: theme === "light" ? "#000000" : "#d1d1d1", // Soft Gray for readability
             }}
           >
             {value_converter(item.statistics.viewCount)} Views &bull;
