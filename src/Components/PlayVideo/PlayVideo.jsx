@@ -230,11 +230,14 @@ const PlayVideo = ({ videoId }) => {
     const [channelData, setChannelData] = useState(null);
     const [commentData, setCommentData] = useState([]);
     const [isPremium, setIsPremium] = useState(false);
+    const [lastDownloadDate, setLastDownloadDate] = useState(null);
 
     useEffect(() => {
-        if (localStorage.getItem("isPremium") === "true") {
-            setIsPremium(true);
-        }
+        const storedPremium = localStorage.getItem("isPremium");
+        const storedDate = localStorage.getItem("lastDownloadDate");
+
+        if (storedPremium === "true") setIsPremium(true);
+        if (storedDate) setLastDownloadDate(storedDate);
     }, []);
 
     const fetchVideoData = async () => {
@@ -267,7 +270,15 @@ const PlayVideo = ({ videoId }) => {
     }, [apiData]);
 
     const handleDownload = () => {
-        localStorage.setItem('downloadedVideo', JSON.stringify(apiData));
+        const today = new Date().toISOString().split('T')[0]; // Get current date (YYYY-MM-DD)
+
+        if (lastDownloadDate === today) {
+            alert("You have already downloaded a video today. Please make a payment to download again.");
+            return;
+        }
+
+        localStorage.setItem('lastDownloadDate', today);
+        setLastDownloadDate(today);
         alert("Video downloaded successfully!");
     };
 
@@ -295,17 +306,18 @@ const PlayVideo = ({ videoId }) => {
         }
 
         const options = {
-            key: "rzp_live_sDDQtMTi6CD1HY", 
+            key: "rzp_live_sDDQtMTi6CD1HY",
             amount: 100, // ₹1 in paise
             currency: "INR",
             name: "Your Business Name",
             description: "Payment for ₹1",
             image: "https://example.com/your_logo.png",
-            "order_id": "order_PzyPaIVglFJtEJ",
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
-                setIsPremium(true); // Automatically updates UI without refresh
+                localStorage.removeItem("lastDownloadDate"); // Reset download limit
+                setIsPremium(true); // Updates UI without refresh
+                setLastDownloadDate(null);
             },
             prefill: {
                 name: "John Doe",
