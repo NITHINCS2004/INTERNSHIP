@@ -288,22 +288,45 @@ const PlayVideo = ({ videoId }) => {
         alert("Video downloaded! Please pay ₹1 to unlock.");
     };
 
-    const handlePayment = () => {
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handlePayment = async () => {
+        const res = await loadRazorpayScript();
+
+        if (!res) {
+            alert("Failed to load Razorpay. Check your internet connection.");
+            return;
+        }
+
         const options = {
-            key: "rzp_live_sDDQtMTi6CD1HY",
+            key: "rzp_live_sDDQtMTi6CD1HY", 
             amount: 100, // ₹1 in paise
             currency: "INR",
             name: "Your Business Name",
             description: "Payment for ₹1",
             image: "https://example.com/your_logo.png",
+            "order_id": "order_PzxRaHeJKi2wae",
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
                 localStorage.setItem("paymentID", response.razorpay_payment_id);
-                localStorage.removeItem("downloadedDate"); // Allow new downloads
+                localStorage.removeItem("downloadedDate"); 
                 setIsPremium(true);
                 setDownloaded(false);
-                window.location.reload(); // Reload to reflect changes
+                window.location.reload();
             },
             prefill: {
                 name: "John Doe",
@@ -315,8 +338,8 @@ const PlayVideo = ({ videoId }) => {
             }
         };
 
-        const rzp1 = new window.Razorpay(options);
-        rzp1.open();
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
     };
 
     return (
@@ -361,27 +384,6 @@ const PlayVideo = ({ videoId }) => {
                     <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
                 </div>
                 <button type="button">Subscribe</button>
-            </div>
-
-            <div className="vid-description">
-                <p>{apiData ? apiData.snippet.description.slice(0, 250) : "Description Here"}</p>
-                <h4>{apiData ? value_converter(apiData.statistics.commentCount) : 130} Comments</h4>
-                {commentData.map((item, index) => (
-                    <div key={index} className="comment">
-                        <img src={item.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="" />
-                        <div>
-                            <h3>{item.snippet.topLevelComment.snippet.authorDisplayName} 
-                                <span> {moment(item.snippet.topLevelComment.snippet.publishedAt).fromNow()}</span>
-                            </h3>
-                            <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
-                            <div className="comment-action">
-                                <img src={like} alt="like" />
-                                <span>{item.snippet.topLevelComment.snippet.likeCount}</span>
-                                <img src={dislike} alt="dislike" />
-                            </div>
-                        </div>
-                    </div>
-                ))}
             </div>
         </div>
     );
