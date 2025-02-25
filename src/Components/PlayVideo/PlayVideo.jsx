@@ -214,8 +214,7 @@ const PlayVideo = ({ videoId }) => {
 };
 
 export default PlayVideo;
-*/
-import React, { useEffect, useState } from 'react';
+*/import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
 import like from '../../assets/like.png';
 import dislike from '../../assets/dislike.png';
@@ -231,16 +230,10 @@ const PlayVideo = ({ videoId }) => {
     const [isPremium, setIsPremium] = useState(false);
     const [downloaded, setDownloaded] = useState(false);
 
-    const currentHour = new Date().getHours();
-    const isWhiteTheme = currentHour >= 10 && currentHour < 12;
-
     useEffect(() => {
-        const checkPremiumStatus = localStorage.getItem("isPremium") === "true";
-        setIsPremium(checkPremiumStatus);
-
-        const downloadedVideo = localStorage.getItem("downloadedVideo");
-        if (downloadedVideo) {
-            setDownloaded(true);
+        const checkPremiumStatus = localStorage.getItem("isPremium");
+        if (checkPremiumStatus === "true") {
+            setIsPremium(true);
         }
     }, []);
 
@@ -267,24 +260,24 @@ const PlayVideo = ({ videoId }) => {
     useEffect(() => {
         fetchVideoData();
         window.scrollTo(0, 0);
-    }, [videoId]);
+    }, []);
 
     useEffect(() => {
         fetchOtherData();
     }, [apiData]);
 
     const handleDownload = () => {
-        if (!downloaded) {
+        if (!downloaded && !isPremium) {
             localStorage.setItem('downloadedVideo', JSON.stringify(apiData));
-            alert("Video downloaded successfully!");
             setDownloaded(true);
+            alert("Video downloaded! Pay ₹1 to unlock full access.");
         }
     };
 
     const handlePayment = () => {
         const options = {
             key: "rzp_live_sDDQtMTi6CD1HY",
-            amount: "100", // ₹1 in paisa
+            amount: 100, // ₹1 in paise
             currency: "INR",
             name: "Your Business Name",
             description: "Payment for ₹1",
@@ -292,18 +285,26 @@ const PlayVideo = ({ videoId }) => {
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
-                localStorage.setItem("paymentId", response.razorpay_payment_id);
+                localStorage.setItem("paymentID", response.razorpay_payment_id);
                 setIsPremium(true);
             },
-            theme: { color: "#3399cc" }
+            prefill: {
+                name: "John Doe",
+                email: "johndoe@example.com",
+                contact: "9999999999"
+            },
+            theme: {
+                color: "#3399cc"
+            }
         };
+
         const rzp1 = new window.Razorpay(options);
         rzp1.open();
     };
 
     return (
-        <div className="play-video" style={{ backgroundColor: isWhiteTheme ? '#ffffff' : '#181818', color: isWhiteTheme ? '#000000' : '#ffffff' }}>
-            <iframe src={`https://www.youtube.com/embed/${videoId}?&autoplay=1`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+        <div className="play-video">
+            <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
             
             <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
             
@@ -316,14 +317,12 @@ const PlayVideo = ({ videoId }) => {
                             {downloaded && <button onClick={handlePayment}>Pay ₹1</button>}
                         </>
                     )}
-                    <span><img src={like} alt="" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
-                    <span><img src={dislike} alt="" />2</span>
-                    <span><img src={share} alt="" />Share</span>
-                    <span><img src={save} alt="" />Save</span>
+                    <span><img src={like} alt="like" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
+                    <span><img src={dislike} alt="dislike" />2</span>
+                    <span><img src={share} alt="share" />Share</span>
+                    <span><img src={save} alt="save" />Save</span>
                 </div>
             </div>
-
-            <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
 
             <div className="publisher">
                 <img src={channelData ? channelData.snippet.thumbnails.default.url : ""} alt="" />
@@ -336,7 +335,6 @@ const PlayVideo = ({ videoId }) => {
 
             <div className="vid-description">
                 <p>{apiData ? apiData.snippet.description.slice(0, 250) : "Description Here"}</p>
-                <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
                 <h4>{apiData ? value_converter(apiData.statistics.commentCount) : 130} Comments</h4>
                 {commentData.map((item, index) => (
                     <div key={index} className="comment">
@@ -347,9 +345,9 @@ const PlayVideo = ({ videoId }) => {
                             </h3>
                             <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
                             <div className="comment-action">
-                                <img src={like} alt="" />
+                                <img src={like} alt="like" />
                                 <span>{item.snippet.topLevelComment.snippet.likeCount}</span>
-                                <img src={dislike} alt="" />
+                                <img src={dislike} alt="dislike" />
                             </div>
                         </div>
                     </div>
