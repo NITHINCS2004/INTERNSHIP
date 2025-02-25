@@ -338,6 +338,39 @@ const PlayVideo = ({ videoId }) => {
                     <span><img src={save} alt="" />Save</span>
                 </div>
             </div>
+            <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
+
+            <div className="publisher">
+                <img src={channelData ? channelData.snippet.thumbnails.default.url : ""} alt="" />
+                <div>
+                    <p>{apiData ? apiData.snippet.channelTitle : ""}</p>
+                    <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
+                </div>
+                <button type="button">Subscribe</button>
+            </div>
+
+            <div className="vid-description">
+                <p>{apiData ? apiData.snippet.description.slice(0, 250) : "Description Here"}</p>
+                <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
+                <h4>{apiData ? value_converter(apiData.statistics.commentCount) : 130} Comments</h4>
+
+                {commentData.map((item, index) => (
+                    <div key={index} className="comment">
+                        <img src={item.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="" />
+                        <div>
+                            <h3>{item.snippet.topLevelComment.snippet.authorDisplayName} 
+                                <span> {moment(item.snippet.topLevelComment.snippet.publishedAt).fromNow()}</span>
+                            </h3>
+                            <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
+                            <div className="comment-action">
+                                <img src={like} alt="" />
+                                <span>{item.snippet.topLevelComment.snippet.likeCount}</span>
+                                <img src={dislike} alt="" />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
