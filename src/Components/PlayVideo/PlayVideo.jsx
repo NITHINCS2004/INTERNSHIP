@@ -235,9 +235,12 @@ const PlayVideo = ({ videoId }) => {
     const isWhiteTheme = currentHour >= 10 && currentHour < 12;
 
     useEffect(() => {
-        const checkPremiumStatus = localStorage.getItem("isPremium");
-        if (checkPremiumStatus === "true") {
-            setIsPremium(true);
+        const checkPremiumStatus = localStorage.getItem("isPremium") === "true";
+        setIsPremium(checkPremiumStatus);
+
+        const downloadedVideo = localStorage.getItem("downloadedVideo");
+        if (downloadedVideo) {
+            setDownloaded(true);
         }
     }, []);
 
@@ -264,15 +267,16 @@ const PlayVideo = ({ videoId }) => {
     useEffect(() => {
         fetchVideoData();
         window.scrollTo(0, 0);
-    }, []);
+    }, [videoId]);
 
     useEffect(() => {
         fetchOtherData();
     }, [apiData]);
 
     const handleDownload = () => {
-        if (!downloaded && !isPremium) {
+        if (!downloaded) {
             localStorage.setItem('downloadedVideo', JSON.stringify(apiData));
+            alert("Video downloaded successfully!");
             setDownloaded(true);
         }
     };
@@ -280,7 +284,7 @@ const PlayVideo = ({ videoId }) => {
     const handlePayment = () => {
         const options = {
             key: "rzp_live_sDDQtMTi6CD1HY",
-            amount: "100",
+            amount: "100", // ₹1 in paisa
             currency: "INR",
             name: "Your Business Name",
             description: "Payment for ₹1",
@@ -288,6 +292,7 @@ const PlayVideo = ({ videoId }) => {
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
+                localStorage.setItem("paymentId", response.razorpay_payment_id);
                 setIsPremium(true);
             },
             theme: { color: "#3399cc" }
@@ -305,8 +310,12 @@ const PlayVideo = ({ videoId }) => {
             <div className="play-video-info">
                 <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
                 <div>
-                    <button onClick={handleDownload} disabled={downloaded && !isPremium}>Download</button>
-                    {downloaded && !isPremium && <button onClick={handlePayment}>Pay ₹1</button>}
+                    {!isPremium && (
+                        <>
+                            <button onClick={handleDownload} disabled={downloaded}>Download</button>
+                            {downloaded && <button onClick={handlePayment}>Pay ₹1</button>}
+                        </>
+                    )}
                     <span><img src={like} alt="" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
                     <span><img src={dislike} alt="" />2</span>
                     <span><img src={share} alt="" />Share</span>
