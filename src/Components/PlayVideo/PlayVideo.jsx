@@ -216,6 +216,7 @@ const PlayVideo = ({ videoId }) => {
 export default PlayVideo;
 
 */
+
 import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
 import like from '../../assets/like.png';
@@ -336,21 +337,21 @@ const PlayVideo = ({ videoId }) => {
     return (
         <div className="play-video">
             <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
-            
+
             <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
-            
+
             <div className="play-video-info">
                 <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
                 <div>
-                    <button 
-                        onClick={handleDownload} 
+                    <button
+                        onClick={handleDownload}
                         style={{ backgroundColor: "#ff0000", cursor: "pointer", color: "#fff" }}
                     >
                         Download
                     </button>
                     {!isPremium && (
-                        <button 
-                            onClick={handlePayment} 
+                        <button
+                            onClick={handlePayment}
                             style={{ backgroundColor: "#00cc00", cursor: "pointer", color: "#fff" }}
                         >
                             Pay ₹1
@@ -363,6 +364,7 @@ const PlayVideo = ({ videoId }) => {
                 </div>
             </div>
 
+
             <div className="publisher">
                 <img src={channelData ? channelData.snippet.thumbnails.default.url : ""} alt="" />
                 <div>
@@ -372,21 +374,28 @@ const PlayVideo = ({ videoId }) => {
                 <button type="button">Subscribe</button>
             </div>
 
-            <div className="comments">
-                <h4>Comments</h4>
-                {commentData.length > 0 ? (
-                    commentData.map((comment, index) => (
-                        <div key={index} className="comment">
-                            <img src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="User" />
-                            <div>
-                                <h5>{comment.snippet.topLevelComment.snippet.authorDisplayName}</h5>
-                                <p>{comment.snippet.topLevelComment.snippet.textDisplay}</p>
+
+            <div className="vid-description">
+                <p>{apiData ? apiData.snippet.description.slice(0, 250) : "Description Here"}</p>
+                <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
+                <h4>{apiData ? value_converter(apiData.statistics.commentCount) : 130} Comments</h4>
+
+                {comments.map((item, index) => (
+                    <div key={index} className="comment">
+                        <img src={item.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="" />
+                        <div>
+                            <h3>{item.snippet.topLevelComment.snippet.authorDisplayName}
+                                <span> {moment(item.snippet.topLevelComment.snippet.publishedAt).fromNow()}</span>
+                            </h3>
+                            <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
+                            <div className="comment-action">
+                                <img src={like} alt="" />
+                                <span>{item.snippet.topLevelComment.snippet.likeCount}</span>
+                                <img src={dislike} alt="" />
                             </div>
                         </div>
-                    ))
-                ) : (
-                    <p>No comments available.</p>
-                )}
+                    </div>
+                ))}
             </div>
         </div>
     );
