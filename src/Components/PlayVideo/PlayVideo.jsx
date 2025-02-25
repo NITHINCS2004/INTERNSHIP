@@ -230,16 +230,8 @@ const PlayVideo = ({ videoId }) => {
     const [channelData, setChannelData] = useState(null);
     const [commentData, setCommentData] = useState([]);
     const [isPremium, setIsPremium] = useState(false);
-    const [downloaded, setDownloaded] = useState(false);
 
     useEffect(() => {
-        const lastDownloadedDate = localStorage.getItem("downloadedDate");
-        const today = new Date().toISOString().split('T')[0];
-
-        if (lastDownloadedDate === today) {
-            setDownloaded(true);
-        }
-
         if (localStorage.getItem("isPremium") === "true") {
             setIsPremium(true);
         }
@@ -275,17 +267,8 @@ const PlayVideo = ({ videoId }) => {
     }, [apiData]);
 
     const handleDownload = () => {
-        const today = new Date().toISOString().split('T')[0];
-
-        if (downloaded) {
-            alert("You can only download one video per day. Please complete the payment.");
-            return;
-        }
-
         localStorage.setItem('downloadedVideo', JSON.stringify(apiData));
-        localStorage.setItem('downloadedDate', today);
-        setDownloaded(true);
-        alert("Video downloaded! Please pay ₹1 to unlock.");
+        alert("Video downloaded successfully!");
     };
 
     const loadRazorpayScript = () => {
@@ -318,15 +301,11 @@ const PlayVideo = ({ videoId }) => {
             name: "Your Business Name",
             description: "Payment for ₹1",
             image: "https://example.com/your_logo.png",
-            "order_id": "order_PzxRaHeJKi2wae",
+            "order_id": "order_PzyPaIVglFJtEJ",
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
-                localStorage.setItem("paymentID", response.razorpay_payment_id);
-                localStorage.removeItem("downloadedDate"); 
-                setIsPremium(true);
-                setDownloaded(false);
-                window.location.reload();
+                setIsPremium(true); // Automatically updates UI without refresh
             },
             prefill: {
                 name: "John Doe",
@@ -351,24 +330,19 @@ const PlayVideo = ({ videoId }) => {
             <div className="play-video-info">
                 <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
                 <div>
+                    <button 
+                        onClick={handleDownload} 
+                        style={{ backgroundColor: "#ff0000", cursor: "pointer", color: "#fff" }}
+                    >
+                        Download
+                    </button>
                     {!isPremium && (
-                        <>
-                            <button 
-                                onClick={handleDownload} 
-                                disabled={downloaded} 
-                                style={{ backgroundColor: downloaded ? "#ccc" : "#ff0000", cursor: downloaded ? "not-allowed" : "pointer" }}
-                            >
-                                Download
-                            </button>
-                            {downloaded && (
-                                <button 
-                                    onClick={handlePayment} 
-                                    style={{ backgroundColor: "#00cc00", cursor: "pointer", color: "#fff" }}
-                                >
-                                    Pay ₹1
-                                </button>
-                            )}
-                        </>
+                        <button 
+                            onClick={handlePayment} 
+                            style={{ backgroundColor: "#00cc00", cursor: "pointer", color: "#fff" }}
+                        >
+                            Pay ₹1
+                        </button>
                     )}
                     <span><img src={like} alt="like" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
                     <span><img src={dislike} alt="dislike" />2</span>
@@ -384,6 +358,23 @@ const PlayVideo = ({ videoId }) => {
                     <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
                 </div>
                 <button type="button">Subscribe</button>
+            </div>
+
+            <div className="comments">
+                <h4>Comments</h4>
+                {commentData.length > 0 ? (
+                    commentData.map((comment, index) => (
+                        <div key={index} className="comment">
+                            <img src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="User" />
+                            <div>
+                                <h5>{comment.snippet.topLevelComment.snippet.authorDisplayName}</h5>
+                                <p>{comment.snippet.topLevelComment.snippet.textDisplay}</p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p>No comments available.</p>
+                )}
             </div>
         </div>
     );
