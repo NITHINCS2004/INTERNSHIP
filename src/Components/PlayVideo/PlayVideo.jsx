@@ -214,7 +214,9 @@ const PlayVideo = ({ videoId }) => {
 };
 
 export default PlayVideo;
-*/import React, { useEffect, useState } from 'react';
+
+*/
+import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
 import like from '../../assets/like.png';
 import dislike from '../../assets/dislike.png';
@@ -231,8 +233,14 @@ const PlayVideo = ({ videoId }) => {
     const [downloaded, setDownloaded] = useState(false);
 
     useEffect(() => {
-        const checkPremiumStatus = localStorage.getItem("isPremium");
-        if (checkPremiumStatus === "true") {
+        const lastDownloadedDate = localStorage.getItem("downloadedDate");
+        const today = new Date().toISOString().split('T')[0];
+
+        if (lastDownloadedDate === today) {
+            setDownloaded(true);
+        }
+
+        if (localStorage.getItem("isPremium") === "true") {
             setIsPremium(true);
         }
     }, []);
@@ -267,11 +275,17 @@ const PlayVideo = ({ videoId }) => {
     }, [apiData]);
 
     const handleDownload = () => {
-        if (!downloaded && !isPremium) {
-            localStorage.setItem('downloadedVideo', JSON.stringify(apiData));
-            setDownloaded(true);
-            alert("Video downloaded! Pay ₹1 to unlock full access.");
+        const today = new Date().toISOString().split('T')[0];
+
+        if (downloaded) {
+            alert("You can only download one video per day. Please complete the payment.");
+            return;
         }
+
+        localStorage.setItem('downloadedVideo', JSON.stringify(apiData));
+        localStorage.setItem('downloadedDate', today);
+        setDownloaded(true);
+        alert("Video downloaded! Please pay ₹1 to unlock.");
     };
 
     const handlePayment = () => {
@@ -286,7 +300,10 @@ const PlayVideo = ({ videoId }) => {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
                 localStorage.setItem("paymentID", response.razorpay_payment_id);
+                localStorage.removeItem("downloadedDate"); // Allow new downloads
                 setIsPremium(true);
+                setDownloaded(false);
+                window.location.reload(); // Reload to reflect changes
             },
             prefill: {
                 name: "John Doe",
@@ -313,8 +330,21 @@ const PlayVideo = ({ videoId }) => {
                 <div>
                     {!isPremium && (
                         <>
-                            <button onClick={handleDownload} disabled={downloaded}>Download</button>
-                            {downloaded && <button onClick={handlePayment}>Pay ₹1</button>}
+                            <button 
+                                onClick={handleDownload} 
+                                disabled={downloaded} 
+                                style={{ backgroundColor: downloaded ? "#ccc" : "#ff0000", cursor: downloaded ? "not-allowed" : "pointer" }}
+                            >
+                                Download
+                            </button>
+                            {downloaded && (
+                                <button 
+                                    onClick={handlePayment} 
+                                    style={{ backgroundColor: "#00cc00", cursor: "pointer", color: "#fff" }}
+                                >
+                                    Pay ₹1
+                                </button>
+                            )}
                         </>
                     )}
                     <span><img src={like} alt="like" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
