@@ -230,14 +230,14 @@ const PlayVideo = ({ videoId }) => {
     const [channelData, setChannelData] = useState(null);
     const [commentData, setCommentData] = useState([]);
     const [isPremium, setIsPremium] = useState(false);
-    const [lastDownloadDate, setLastDownloadDate] = useState(null);
+    const [downloadDate, setDownloadDate] = useState(null);
 
     useEffect(() => {
         const storedPremium = localStorage.getItem("isPremium");
-        const storedDate = localStorage.getItem("lastDownloadDate");
+        const storedDate = localStorage.getItem("downloadDate");
 
         if (storedPremium === "true") setIsPremium(true);
-        if (storedDate) setLastDownloadDate(storedDate);
+        if (storedDate) setDownloadDate(storedDate);
     }, []);
 
     const fetchVideoData = async () => {
@@ -272,13 +272,13 @@ const PlayVideo = ({ videoId }) => {
     const handleDownload = () => {
         const today = new Date().toISOString().split('T')[0]; // Get current date (YYYY-MM-DD)
 
-        if (lastDownloadDate === today) {
+        if (!isPremium && downloadDate === today) {
             alert("You have already downloaded a video today. Please make a payment to download again.");
             return;
         }
 
-        localStorage.setItem('lastDownloadDate', today);
-        setLastDownloadDate(today);
+        localStorage.setItem('downloadDate', today);
+        setDownloadDate(today);
         alert("Video downloaded successfully!");
     };
 
@@ -315,9 +315,9 @@ const PlayVideo = ({ videoId }) => {
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 localStorage.setItem("isPremium", "true");
-                localStorage.removeItem("lastDownloadDate"); // Reset download limit
+                localStorage.setItem("downloadDate", new Date().toISOString().split('T')[0]); // Reset download limit
                 setIsPremium(true); // Updates UI without refresh
-                setLastDownloadDate(null);
+                setDownloadDate(new Date().toISOString().split('T')[0]);
             },
             prefill: {
                 name: "John Doe",
