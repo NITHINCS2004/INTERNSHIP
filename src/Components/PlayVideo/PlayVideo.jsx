@@ -277,6 +277,20 @@ const PlayVideo = ({ videoId }) => {
             alert("You have already downloaded a video today. Please make a payment to download again.");
             return;
         }
+        if (apiData) {
+            const importantVideos = JSON.parse(localStorage.getItem("importantVideos")) || [];
+    
+            const videoDetails = {
+                videoId: videoId,
+                title: apiData.snippet.title,
+                channel: apiData.snippet.channelTitle,
+                thumbnail: apiData.snippet.thumbnails.default.url,
+                dateSaved: today
+            };
+    
+            importantVideos.push(videoDetails);
+            localStorage.setItem("importantVideos", JSON.stringify(importantVideos));
+    
 
         localStorage.setItem('downloadDate', today);
         setDownloadDate(today);
