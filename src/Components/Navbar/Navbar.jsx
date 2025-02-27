@@ -198,6 +198,25 @@ const Navbar = ({ setSidebar }) => {
     const [downloadedVideos, setDownloadedVideos] = useState([]);
     const [showSearch, setShowSearch] = useState(true);
 
+    // Function to fetch and update downloaded videos
+    const fetchDownloadedVideos = () => {
+        const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [];
+        setDownloadedVideos(storedVideos);
+    };
+
+    useEffect(() => {
+        // Fetch videos on load
+        fetchDownloadedVideos();
+
+        // Listen to storage changes (Works across tabs & auto-updates)
+        const handleStorageChange = () => fetchDownloadedVideos();
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
     useEffect(() => {
         const fetchLocationAndSetTheme = async () => {
             try {
@@ -217,36 +236,15 @@ const Navbar = ({ setSidebar }) => {
                 setTimePeriod(new Date().getHours() >= 12 ? "PM" : "AM");
             }
         };
-
         fetchLocationAndSetTheme();
 
-        const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [];
-        setDownloadedVideos(storedVideos);
-
-        // Listen for changes in localStorage to update videos dynamically
-        const handleStorageChange = () => {
-            setDownloadedVideos(JSON.parse(localStorage.getItem("downloadedVideos")) || []);
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []);
-
-    useEffect(() => {
+        // Resize event listener to hide search bar on small screens
         const handleResize = () => {
-            const screenWidth = window.innerWidth;
-            if (screenWidth < 600) {
-                setShowSearch(false);
-            } else {
-                setShowSearch(true);
-            }
+            setShowSearch(window.innerWidth > 600); // Hide if screen width <= 600px
         };
 
         window.addEventListener("resize", handleResize);
-        handleResize();
+        handleResize(); // Set initial state
 
         return () => {
             window.removeEventListener("resize", handleResize);
