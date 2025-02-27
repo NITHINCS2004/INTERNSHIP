@@ -196,6 +196,7 @@ const Navbar = ({ setSidebar }) => {
     const [timePeriod, setTimePeriod] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const [downloadedVideos, setDownloadedVideos] = useState([]);
+    const [showSearch, setShowSearch] = useState(true);
 
     useEffect(() => {
         const fetchLocationAndSetTheme = async () => {
@@ -216,9 +217,40 @@ const Navbar = ({ setSidebar }) => {
                 setTimePeriod(new Date().getHours() >= 12 ? "PM" : "AM");
             }
         };
+
         fetchLocationAndSetTheme();
+
         const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [];
         setDownloadedVideos(storedVideos);
+
+        // Listen for changes in localStorage to update videos dynamically
+        const handleStorageChange = () => {
+            setDownloadedVideos(JSON.parse(localStorage.getItem("downloadedVideos")) || []);
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const screenWidth = window.innerWidth;
+            if (screenWidth < 600) {
+                setShowSearch(false);
+            } else {
+                setShowSearch(true);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+        handleResize();
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
 
     const sidebar_toggle = () => {
@@ -244,35 +276,37 @@ const Navbar = ({ setSidebar }) => {
                 <img src={menu_icon} alt="" style={{ width: "24px", marginRight: "15px", cursor: "pointer" }} onClick={sidebar_toggle} />
                 <Link to='/'> <img src={logo} alt="" style={{ width: "120px" }} /></Link>
             </div>
-            <div style={{ display: "flex", alignItems: "center", flexGrow: "1", justifyContent: "center" }}>
-                <div style={{
-                    border: "1px solid #ccc",
-                    padding: "6px 12px",
-                    borderRadius: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    background: theme === "light" ? "#fff" : "#444",
-                    color: theme === "light" ? "#000" : "#fff",
-                    width: "50%"
-                }}>
-                    <input type="text" placeholder="Search" style={{
-                        width: "100%",
-                        border: "none",
-                        outline: "none",
-                        background: "transparent",
+            {showSearch && (
+                <div style={{ display: "flex", alignItems: "center", flexGrow: "1", justifyContent: "center" }}>
+                    <div style={{
+                        border: "1px solid #ccc",
+                        padding: "6px 12px",
+                        borderRadius: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        background: theme === "light" ? "#fff" : "#444",
                         color: theme === "light" ? "#000" : "#fff",
+                        width: "50%"
+                    }}>
+                        <input type="text" placeholder="Search" style={{
+                            width: "100%",
+                            border: "none",
+                            outline: "none",
+                            background: "transparent",
+                            color: theme === "light" ? "#000" : "#fff",
+                            fontSize: "14px",
+                            padding: "5px"
+                        }} />
+                        <img src={search_icon} alt="" style={{ width: "14px" }} />
+                    </div>
+                    <span style={{
+                        marginLeft: "10px",
+                        fontWeight: "bold",
                         fontSize: "14px",
-                        padding: "5px"
-                    }} />
-                    <img src={search_icon} alt="" style={{ width: "14px" }} />
+                        color: timePeriod === "AM" ? "#007bff" : "#ff4500"
+                    }}>{timePeriod}</span>
                 </div>
-                <span style={{
-                    marginLeft: "10px",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                    color: timePeriod === "AM" ? "#007bff" : "#ff4500"
-                }}>{timePeriod}</span>
-            </div>
+            )}
             <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
                 <img src={upload_icon} alt="" style={{ width: "24px", marginRight: "15px" }} />
                 <img src={more_icon} alt="" style={{ width: "24px", marginRight: "15px" }} />
