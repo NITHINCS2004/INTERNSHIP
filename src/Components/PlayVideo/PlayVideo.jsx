@@ -407,5 +407,5 @@ const PlayVideo = ({ videoId }) => {
             </div>
         );
     };
-
+}
     export default PlayVideo;
