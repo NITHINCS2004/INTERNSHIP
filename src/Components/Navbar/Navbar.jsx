@@ -156,6 +156,7 @@ const Navbar = ({ setSidebar }) => {
 
 export default Navbar;
 */
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import menu_icon from '../../assets/menu.png';
@@ -187,7 +188,6 @@ const Navbar = ({ setSidebar }) => {
 
                 const newTheme = isSouthIndia && isWhiteThemeTime ? "light" : "dark";
                 setTheme(newTheme);
-
                 setTimePeriod(currentHour >= 12 ? "PM" : "AM");
             } catch (error) {
                 console.error("Error fetching location data:", error);
@@ -195,69 +195,29 @@ const Navbar = ({ setSidebar }) => {
                 setTimePeriod(new Date().getHours() >= 12 ? "PM" : "AM");
             }
         };
-
+        
         fetchLocationAndSetTheme();
-
-        // Fetch downloaded videos from localStorage (Example data)
-        const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [
-            { id: 1, title: "Sample Video 1", thumbnail: jack_img },
-            { id: 2, title: "Sample Video 2", thumbnail: jack_img },
-        ];
+        const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [];
         setDownloadedVideos(storedVideos);
     }, []);
-
-    const toggleDropdown = () => {
-        setShowDropdown((prev) => !prev);
-    };
-
-    const navbarStyles = {
-        padding: "10px 2%",
-        justifyContent: "space-between",
-        boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-        background: theme === "light" ? "#f8f9fa" : "#333",
-        color: theme === "light" ? "#333" : "#f8f9fa",
-        position: "sticky",
-        top: "0",
-        zIndex: "10",
-        display: "flex",
-        alignItems: "center"
-    };
-
-    const dropdownStyles = {
-        position: "absolute",
-        top: "50px",
-        right: "10px",
-        width: "250px",
-        background: theme === "light" ? "#fff" : "#444",
-        color: theme === "light" ? "#000" : "#fff",
-        borderRadius: "10px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-        padding: "10px",
-        display: showDropdown ? "block" : "none",
-        maxHeight: "300px",
-        overflowY: "auto"
-    };
-
-    const videoItemStyles = {
-        display: "flex",
-        alignItems: "center",
-        padding: "8px",
-        borderBottom: "1px solid #ccc",
-    };
-
-    const videoImageStyles = {
-        width: "40px",
-        height: "40px",
-        borderRadius: "50%",
-        marginRight: "10px"
-    };
 
     const sidebar_toggle = () => {
         setSidebar((prev) => !prev);
     };
 
     return (
-        <nav style={navbarStyles}>
+        <nav style={{
+            padding: "10px 2%",
+            justifyContent: "space-between",
+            boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+            background: theme === "light" ? "#f8f9fa" : "#333",
+            color: theme === "light" ? "#333" : "#f8f9fa",
+            position: "sticky",
+            top: "0",
+            zIndex: "10",
+            display: "flex",
+            alignItems: "center"
+        }}>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <img src={menu_icon} alt="" style={{ width: "22px", marginRight: "25px", cursor: "pointer" }} onClick={sidebar_toggle} />
                 <Link to='/'> <img src={logo} alt="" style={{ width: "130px" }} /></Link>
@@ -282,33 +242,58 @@ const Navbar = ({ setSidebar }) => {
                     }} />
                     <img src={search_icon} alt="" style={{ width: "15px" }} />
                 </div>
-                <span style={{ marginLeft: "15px", fontWeight: "bold", color: timePeriod === "AM" ? "#007bff" : "#ff4500" }}>{timePeriod}</span>
+                <span style={{
+                    marginLeft: "15px",
+                    fontWeight: "bold",
+                    color: timePeriod === "AM" ? "#007bff" : "#ff4500"
+                }}>{timePeriod}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
                 <img src={upload_icon} alt="" style={{ width: "25px", marginRight: "25px" }} />
                 <img src={more_icon} alt="" style={{ width: "25px", marginRight: "25px" }} />
                 <img src={notification_icon} alt="" style={{ width: "25px", marginRight: "25px" }} />
-
-                {/* Profile Image & Dropdown */}
-                <img src={jack_img} alt="Profile" style={{ width: "35px", borderRadius: "50%", cursor: "pointer" }} onClick={toggleDropdown} />
-
-                {/* Dropdown List */}
-                <div style={dropdownStyles}>
-                    <h4>Downloaded Videos</h4>
-                    {downloadedVideos.length > 0 ? (
-                        downloadedVideos.map((video) => (
-                            <div key={video.id} style={videoItemStyles}>
-                                <img src={video.thumbnail} alt={video.title} style={videoImageStyles} />
-                                <span>{video.title}</span>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No downloads available</p>
-                    )}
-                </div>
+                <img 
+                    src={jack_img} 
+                    alt="" 
+                    style={{ width: "35px", borderRadius: "50%", cursor: "pointer" }} 
+                    onClick={() => setShowDropdown((prev) => !prev)}
+                />
+                {showDropdown && (
+                    <div style={{
+                        position: "absolute",
+                        top: "50px",
+                        right: "0",
+                        background: theme === "light" ? "#fff" : "#444",
+                        color: theme === "light" ? "#000" : "#fff",
+                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "8px",
+                        padding: "10px",
+                        width: "250px",
+                        maxHeight: "300px",
+                        overflowY: "auto",
+                        zIndex: "20"
+                    }}>
+                        <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Downloaded Videos</h4>
+                        {downloadedVideos.length > 0 ? (
+                            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                                {downloadedVideos.map((video, index) => (
+                                    <li key={index} style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>
+                                        <a href={video} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: theme === "light" ? "#007bff" : "#ffa500" }}>
+                                            Video {index + 1}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p style={{ textAlign: "center" }}>No videos downloaded</p>
+                        )}
+                    </div>
+                )}
             </div>
         </nav>
     );
 };
 
 export default Navbar;
+
+
