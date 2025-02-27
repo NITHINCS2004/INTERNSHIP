@@ -181,7 +181,6 @@ export default Navbar;
 
 
 */
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import menu_icon from '../../assets/menu.png';
@@ -232,59 +231,89 @@ const Navbar = ({ setSidebar }) => {
 
     return (
         <nav style={{
-            padding: "10px 2%",
+            padding: "8px 2%",
             justifyContent: "space-between",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+            boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
             background: theme === "light" ? "#f8f9fa" : "#333",
             color: theme === "light" ? "#333" : "#f8f9fa",
             position: "sticky",
             top: "0",
             zIndex: "10",
             display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap"
+            alignItems: "center"
         }}>
             <div style={{ display: "flex", alignItems: "center" }}>
-                <img src={menu_icon} alt="" style={{ width: "22px", marginRight: "15px", cursor: "pointer" }} onClick={sidebar_toggle} />
-                <Link to='/'> <img src={logo} alt="" style={{ width: "130px" }} /></Link>
+                <img src={menu_icon} alt="" style={{ width: "18px", marginRight: "15px", cursor: "pointer" }} onClick={sidebar_toggle} />
+                <Link to='/'> <img src={logo} alt="" style={{ width: "100px" }} /></Link>
             </div>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", justifyContent: "center", flexGrow: 1 }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{
                     border: "1px solid #ccc",
                     marginRight: "10px",
-                    padding: "8px 12px",
-                    borderRadius: "25px",
+                    padding: "5px 10px",
+                    borderRadius: "20px",
                     display: "flex",
                     alignItems: "center",
                     background: theme === "light" ? "#fff" : "#444",
-                    color: theme === "light" ? "#000" : "#fff",
-                    flexGrow: 1,
-                    maxWidth: "500px"
+                    color: theme === "light" ? "#000" : "#fff"
                 }}>
                     <input type="text" placeholder="Search" style={{
-                        width: "100%",
+                        width: "250px",
                         border: "0",
                         outline: "0",
                         background: "transparent",
                         color: theme === "light" ? "#000" : "#fff"
                     }} />
-                    <img src={search_icon} alt="" style={{ width: "15px" }} />
+                    <img src={search_icon} alt="" style={{ width: "12px" }} />
                 </div>
                 <span style={{
+                    marginLeft: "10px",
                     fontWeight: "bold",
+                    fontSize: "12px",
                     color: timePeriod === "AM" ? "#007bff" : "#ff4500"
                 }}>{timePeriod}</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", position: "relative", flexWrap: "wrap" }}>
-                <img src={upload_icon} alt="" style={{ width: "25px", marginRight: "15px" }} />
-                <img src={more_icon} alt="" style={{ width: "25px", marginRight: "15px" }} />
-                <img src={notification_icon} alt="" style={{ width: "25px", marginRight: "15px" }} />
+            <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
+                <img src={upload_icon} alt="" style={{ width: "20px", marginRight: "15px" }} />
+                <img src={more_icon} alt="" style={{ width: "20px", marginRight: "15px" }} />
+                <img src={notification_icon} alt="" style={{ width: "20px", marginRight: "15px" }} />
                 <img 
                     src={jack_img} 
                     alt="" 
-                    style={{ width: "35px", borderRadius: "50%", cursor: "pointer" }} 
+                    style={{ width: "30px", borderRadius: "50%", cursor: "pointer" }} 
                     onClick={() => setShowDropdown((prev) => !prev)}
                 />
+                {showDropdown && (
+                    <div style={{
+                        position: "absolute",
+                        top: "40px",
+                        right: "0",
+                        background: theme === "light" ? "#fff" : "#444",
+                        color: theme === "light" ? "#000" : "#fff",
+                        boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "6px",
+                        padding: "8px",
+                        width: "200px",
+                        maxHeight: "250px",
+                        overflowY: "auto",
+                        zIndex: "20"
+                    }}>
+                        <h4 style={{ textAlign: "center", marginBottom: "8px", fontSize: "14px" }}>Downloaded Videos</h4>
+                        {downloadedVideos.length > 0 ? (
+                            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                                {downloadedVideos.map((video, index) => (
+                                    <li key={index} style={{ padding: "6px", borderBottom: "1px solid #ddd", fontSize: "12px" }}>
+                                        <a href={video} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: theme === "light" ? "#007bff" : "#ffa500" }}>
+                                            Video {index + 1}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p style={{ textAlign: "center", fontSize: "12px" }}>No videos downloaded</p>
+                        )}
+                    </div>
+                )}
             </div>
         </nav>
     );
