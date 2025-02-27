@@ -210,7 +210,6 @@ const Navbar = ({ setSidebar }) => {
 
 export default Navbar;
 */
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import menu_icon from '../../assets/menu.png';
@@ -228,40 +227,21 @@ const Navbar = ({ setSidebar }) => {
     const [downloadedVideos, setDownloadedVideos] = useState([]);
     const [showSearch, setShowSearch] = useState(true);
 
-    // Fetch location-based theme
+    // Determine theme based on time only
     useEffect(() => {
-        const fetchLocationAndSetTheme = async () => {
-            try {
-                const response = await fetch("https://ipapi.co/json/");
-                const data = await response.json();
-                const statesSouthIndia = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana"];
-                const userState = data.region;
-                const currentHour = new Date().getHours();
-
-                // 🔹 Fix AM/PM time logic
-                const isPM = currentHour >= 12;
-                const formattedTime = isPM ? "PM" : "AM";
-
-                const isSouthIndia = statesSouthIndia.includes(userState);
-                const isWhiteThemeTime = currentHour >= 10 && currentHour < 12;
-                const newTheme = isSouthIndia && isWhiteThemeTime ? "light" : "dark";
-
-                setTheme(newTheme);
-                setTimePeriod(formattedTime);
-            } catch (error) {
-                console.error("Error fetching location data:", error);
-                const currentHour = new Date().getHours();
-                setTheme("dark");
-                setTimePeriod(currentHour >= 12 ? "PM" : "AM");
-            }
+        const updateThemeAndTime = () => {
+            const currentHour = new Date().getHours();
+            const isPM = currentHour >= 12;
+            setTimePeriod(isPM ? "PM" : "AM");
+            
+            // Theme logic based on time only
+            setTheme(currentHour >= 10 && currentHour < 12 ? "light" : "dark");
         };
 
-        fetchLocationAndSetTheme();
+        updateThemeAndTime();
         fetchDownloadedVideos();
 
-        // Polling: Check localStorage for updates every second
         const interval = setInterval(fetchDownloadedVideos, 1000);
-
         return () => clearInterval(interval);
     }, []);
 
@@ -279,12 +259,10 @@ const Navbar = ({ setSidebar }) => {
     // Handle window resize to show/hide search box
     useEffect(() => {
         const handleResize = () => {
-            setShowSearch(window.innerWidth > 500); // Hide when width < 500px
+            setShowSearch(window.innerWidth > 500);
         };
-
-        handleResize(); // Initial check
+        handleResize();
         window.addEventListener("resize", handleResize);
-
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
