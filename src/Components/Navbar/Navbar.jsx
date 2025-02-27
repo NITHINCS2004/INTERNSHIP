@@ -198,25 +198,7 @@ const Navbar = ({ setSidebar }) => {
     const [downloadedVideos, setDownloadedVideos] = useState([]);
     const [showSearch, setShowSearch] = useState(true);
 
-    // Function to fetch and update downloaded videos
-    const fetchDownloadedVideos = () => {
-        const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [];
-        setDownloadedVideos(storedVideos);
-    };
-
-    useEffect(() => {
-        // Fetch videos on load
-        fetchDownloadedVideos();
-
-        // Listen to storage changes (Works across tabs & auto-updates)
-        const handleStorageChange = () => fetchDownloadedVideos();
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []);
-
+    // Fetch location-based theme
     useEffect(() => {
         const fetchLocationAndSetTheme = async () => {
             try {
@@ -236,24 +218,38 @@ const Navbar = ({ setSidebar }) => {
                 setTimePeriod(new Date().getHours() >= 12 ? "PM" : "AM");
             }
         };
+
         fetchLocationAndSetTheme();
+        fetchDownloadedVideos();
 
-        // Resize event listener to hide search bar on small screens
-        const handleResize = () => {
-            setShowSearch(window.innerWidth > 600); // Hide if screen width <= 600px
-        };
+        // Polling: Check localStorage for updates every second
+        const interval = setInterval(fetchDownloadedVideos, 1000);
 
-        window.addEventListener("resize", handleResize);
-        handleResize(); // Set initial state
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
+        return () => clearInterval(interval);
     }, []);
 
+    // Fetch downloaded videos from localStorage
+    const fetchDownloadedVideos = () => {
+        const storedVideos = JSON.parse(localStorage.getItem("downloadedVideos")) || [];
+        setDownloadedVideos(storedVideos);
+    };
+
+    // Sidebar toggle function
     const sidebar_toggle = () => {
         setSidebar((prev) => !prev);
     };
+
+    // Handle window resize to show/hide search box
+    useEffect(() => {
+        const handleResize = () => {
+            setShowSearch(window.innerWidth > 500); // Hide when width < 500px
+        };
+
+        handleResize(); // Initial check
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     return (
         <nav style={{
@@ -271,9 +267,10 @@ const Navbar = ({ setSidebar }) => {
             height: "60px"
         }}>
             <div style={{ display: "flex", alignItems: "center" }}>
-                <img src={menu_icon} alt="" style={{ width: "24px", marginRight: "15px", cursor: "pointer" }} onClick={sidebar_toggle} />
-                <Link to='/'> <img src={logo} alt="" style={{ width: "120px" }} /></Link>
+                <img src={menu_icon} alt="menu" style={{ width: "24px", marginRight: "15px", cursor: "pointer" }} onClick={sidebar_toggle} />
+                <Link to='/'> <img src={logo} alt="logo" style={{ width: "120px" }} /></Link>
             </div>
+
             {showSearch && (
                 <div style={{ display: "flex", alignItems: "center", flexGrow: "1", justifyContent: "center" }}>
                     <div style={{
@@ -295,7 +292,7 @@ const Navbar = ({ setSidebar }) => {
                             fontSize: "14px",
                             padding: "5px"
                         }} />
-                        <img src={search_icon} alt="" style={{ width: "14px" }} />
+                        <img src={search_icon} alt="search" style={{ width: "14px" }} />
                     </div>
                     <span style={{
                         marginLeft: "10px",
@@ -305,13 +302,14 @@ const Navbar = ({ setSidebar }) => {
                     }}>{timePeriod}</span>
                 </div>
             )}
+
             <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
-                <img src={upload_icon} alt="" style={{ width: "24px", marginRight: "15px" }} />
-                <img src={more_icon} alt="" style={{ width: "24px", marginRight: "15px" }} />
-                <img src={notification_icon} alt="" style={{ width: "24px", marginRight: "15px" }} />
+                <img src={upload_icon} alt="upload" style={{ width: "24px", marginRight: "15px" }} />
+                <img src={more_icon} alt="more" style={{ width: "24px", marginRight: "15px" }} />
+                <img src={notification_icon} alt="notification" style={{ width: "24px", marginRight: "15px" }} />
                 <img 
                     src={jack_img} 
-                    alt="" 
+                    alt="profile" 
                     style={{ width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer" }} 
                     onClick={() => setShowDropdown((prev) => !prev)}
                 />
