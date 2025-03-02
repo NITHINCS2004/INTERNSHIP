@@ -271,42 +271,7 @@ import megan from "../../assets/megan.png";
 import cameron from "../../assets/cameron.png";
 
 const Sidebar = ({ sidebar, category, setCategory }) => {
-  /*
-  useEffect(() => {
-    const applyTheme = async () => {
-      const now = new Date();
-      let hours = now.getHours();
-      let minutes = now.getMinutes();
-      let ampm = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12 || 12; // Convert to 12-hour format
-
-      try {
-        const response = await fetch("https://ipapi.co/json/");
-        const data = await response.json();
-        const region = data.region;
-
-        const southIndiaStates = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana"];
-
-        if (
-          (hours === 10 || hours === 11 || (hours === 12 && minutes === 0)) &&
-          ampm === "AM" &&
-          southIndiaStates.includes(region)
-        ) {
-          document.body.classList.remove("dark-theme");
-          document.body.classList.add("white-theme");
-        } else {
-          document.body.classList.remove("white-theme");
-          document.body.classList.add("dark-theme");
-        }
-      } catch (error) {
-        console.error("Error fetching location data:", error);
-        document.body.classList.add("dark-theme"); // Default to dark theme on error
-      }
-    };
-
-    applyTheme();
-  }, []);
-  */
+ 
   useEffect(() => {
     const applyTheme = () => {
       const now = new Date();

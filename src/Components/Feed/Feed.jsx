@@ -36,6 +36,7 @@ const Feed = ({category}) => {
 
 export default Feed
 */
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { API_KEY, value_converter } from "../../data";
