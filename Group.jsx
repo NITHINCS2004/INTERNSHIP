@@ -3,7 +3,7 @@ import React from 'react'
 const Group = () => {
   return (
     <div>
-      hi
+      <h2>hi</h2>
     </div>
   )
 }
