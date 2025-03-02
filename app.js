@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 
 const app = express();
-const port = 8786; // Permanent port number
+const port = 8789; // Permanent port number
 
 // Enable CORS
 app.use(cors());

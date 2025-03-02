@@ -15,7 +15,7 @@ const Group = () => {
         if (action === 'join' || action === 'invite') {
             const fetchGroups = async () => {
                 try {
-                    const response = await fetch("http://localhost:8986/get-groups");
+                    const response = await fetch("http://localhost:8989/get-groups");
                     const data = await response.json();
                     setGroups(data);
                 } catch (error) {
@@ -33,14 +33,14 @@ const Group = () => {
         try {
             let response;
             if (action === 'create') {
-                response = await fetch("http://localhost:8986/create-group", {
+                response = await fetch("http://localhost:8989/create-group", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ groupname, description, email }),
                 });
             } else if (action === 'join') {
                 const groupId = e.target.groupId.value;
-                response = await fetch("http://localhost:8986/join-group", {
+                response = await fetch("http://localhost:8989/join-group", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ groupId, email }),
