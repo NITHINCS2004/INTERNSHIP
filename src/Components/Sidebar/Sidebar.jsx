@@ -397,6 +397,10 @@ const Sidebar = ({ sidebar, category, setCategory }) => {
             <img src={news} alt="" />
             <p>News</p>
           </div>
+          <div onClick={() => { setCategory("group") }} className={`side-link ${category === "group" ? "active" : ""}`}>
+               <img src={home} alt="" /> {/* Optional: Use a different icon for "Group" */}
+                  <p>Group</p>
+            </div>
           <hr />
         </div>
         <div className="subscribed-list">
