@@ -153,8 +153,9 @@ const Group = () => {
     const [groupname, setGroupname] = useState("");
     const [description, setDescription] = useState("");
     const [email, setEmail] = useState("");
-    const [action, setAction] = useState(""); // 'create', 'join'
+    const [action, setAction] = useState(""); // 'create', 'join', 'invite'
     const [groups, setGroups] = useState([]);
+    const [inviteEmail, setInviteEmail] = useState("");
     const [selectedGroup, setSelectedGroup] = useState("");
 
     useEffect(() => {
@@ -180,20 +181,34 @@ const Group = () => {
                 return;
             }
 
-            const newGroup = { groupname, description, email };
+            const newGroup = { groupname, description, email, members: [email] };
             const updatedGroups = [...groups, newGroup];
             sessionStorage.setItem("groups", JSON.stringify(updatedGroups));
             setGroups(updatedGroups);
             alert("Group created successfully!");
         } else if (action === 'join') {
-            const alreadyJoinedGroup = groups.find(group => group.email === email);
-
-            if (alreadyJoinedGroup) {
-                alert(`You have already joined the group: ${alreadyJoinedGroup.groupname}`);
+            const groupToJoin = groups.find(group => group.groupname === selectedGroup);
+            if (!groupToJoin) {
+                alert("Group not found.");
                 return;
             }
 
+            if (groupToJoin.members.includes(email)) {
+                alert("You have already joined this group.");
+                return;
+            }
+
+            groupToJoin.members.push(email);
+            sessionStorage.setItem("groups", JSON.stringify(groups));
             alert(`Successfully joined group: ${selectedGroup}`);
+        }
+    };
+
+    const handleInvite = () => {
+        if (inviteEmail.trim() && selectedGroup) {
+            const subject = encodeURIComponent("Group Invitation");
+            const body = encodeURIComponent(`You have been invited to join the group: ${selectedGroup}`);
+            window.location.href = `mailto:${inviteEmail.trim()}?subject=${subject}&body=${body}`;
         }
     };
 
@@ -203,9 +218,10 @@ const Group = () => {
             <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
                 <button style={{ padding: '10px', background: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }} onClick={() => setAction('create')}>Create Group</button>
                 <button style={{ padding: '10px', background: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }} onClick={() => setAction('join')}>Join Existing Group</button>
+                <button style={{ padding: '10px', background: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }} onClick={() => setAction('invite')}>Invite to Group</button>
             </div>
 
-            {action && (
+            {action && action !== 'invite' && (
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
                     {action === 'create' ? (
                         <>
