@@ -137,15 +137,19 @@ const Group = () => {
     };
 
     const handleInvite = () => {
-        if (inviteEmail && selectedGroup) {
+        if (inviteEmail.trim() && selectedGroup) {
             const subject = encodeURIComponent("Group Invitation");
             const body = encodeURIComponent(`You have been invited to join the group: ${selectedGroup}`);
-            window.location.href = `mailto:${inviteEmail}?subject=${subject}&body=${body}`;
-            alert(`Invitation sent to ${inviteEmail}`);
+    
+            // Use window.open to open the default mail app without refreshing the page
+            window.open(`mailto:${inviteEmail.trim()}?subject=${subject}&body=${body}`, '_blank');
+    
+            alert(`Invitation sent to ${inviteEmail.trim()}`);
         } else {
             alert("Please enter an email and select a group.");
         }
     };
+    
 
     return (
         <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', background: '#f9f9f9', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
