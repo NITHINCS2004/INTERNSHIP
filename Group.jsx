@@ -139,7 +139,7 @@ const Group = () => {
 
 export default Group;
 */
-/*
+
 import React, { useState, useEffect } from "react";
 
 const Group = () => {
@@ -285,108 +285,4 @@ const Group = () => {
 };
 
 export default Group;
-*/
-import React, { useState, useEffect } from "react";
 
-const Group = () => {
-    const [groupname, setGroupname] = useState("");
-    const [description, setDescription] = useState("");
-    const [email, setEmail] = useState("");
-    const [action, setAction] = useState(""); // 'create', 'join', 'invite'
-    const [groups, setGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState("");
-
-    useEffect(() => {
-        const loadGroups = () => {
-            const storedGroups = JSON.parse(sessionStorage.getItem("groups")) || [];
-            setGroups(storedGroups);
-        };
-
-        loadGroups();
-
-        // Listen for sessionStorage changes
-        window.addEventListener("storage", loadGroups);
-        return () => window.removeEventListener("storage", loadGroups);
-    }, []);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (action === 'create') {
-            const existingGroup = groups.find(group => group.groupname === groupname);
-            if (existingGroup) {
-                alert("Group with this name already exists.");
-                return;
-            }
-
-            const newGroup = { groupname, description, email, members: [email] };
-            const updatedGroups = [...groups, newGroup];
-            sessionStorage.setItem("groups", JSON.stringify(updatedGroups));
-            setGroups(updatedGroups);
-            alert("Group created successfully!");
-        } else if (action === 'join') {
-            const groupIndex = groups.findIndex(group => group.groupname === selectedGroup);
-            if (groupIndex === -1) {
-                alert("Group not found!");
-                return;
-            }
-
-            if (groups[groupIndex].members.includes(email)) {
-                alert(`You have already joined the group: ${selectedGroup}`);
-                return;
-            }
-
-            // Add user to the group's members list
-            groups[groupIndex].members.push(email);
-            sessionStorage.setItem("groups", JSON.stringify(groups));
-            setGroups([...groups]);
-            alert(`Successfully joined group: ${selectedGroup}`);
-        }
-    };
-
-    return (
-        <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', background: '#f9f9f9', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-            <h2 style={{ textAlign: 'center' }}>Select an Option</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
-                <button onClick={() => setAction('create')}>Create Group</button>
-                <button onClick={() => setAction('join')}>Join Existing Group</button>
-            </div>
-
-            {action && (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
-                    {action === 'create' ? (
-                        <>
-                            <label>Group Name:</label>
-                            <input type="text" value={groupname} onChange={(e) => setGroupname(e.target.value)} required />
-
-                            <label>Group Description:</label>
-                            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-
-                            <label>Your Email:</label>
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-
-                            <button type="submit">Create Group</button>
-                        </>
-                    ) : (
-                        <>
-                            <label>Select Group:</label>
-                            <select onChange={(e) => setSelectedGroup(e.target.value)} required>
-                                <option value="">Select a group</option>
-                                {groups.map((group, index) => (
-                                    <option key={index} value={group.groupname}>{group.groupname}</option>
-                                ))}
-                            </select>
-
-                            <label>Your Email:</label>
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-
-                            <button type="submit">Join Group</button>
-                        </>
-                    )}
-                </form>
-            )}
-        </div>
-    );
-};
-
-export default Group;
