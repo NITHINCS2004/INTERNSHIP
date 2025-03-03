@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './group.css';
 import { db } from './firebaseConfig';
+ // Add .js explicitly
+
 import { addDoc, collection } from 'firebase/firestore';
 
 const Form = () => {
