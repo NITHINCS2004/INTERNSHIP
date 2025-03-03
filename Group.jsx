@@ -293,7 +293,6 @@ const Group = () => {
 
         loadGroups();
 
-        // Listen for sessionStorage changes
         window.addEventListener("storage", loadGroups);
         return () => window.removeEventListener("storage", loadGroups);
     }, []);
@@ -314,21 +313,22 @@ const Group = () => {
             setGroups(updatedGroups);
             alert("Group created successfully!");
         } else if (action === 'join') {
-            const groupIndex = groups.findIndex(group => group.groupname === selectedGroup);
-            if (groupIndex === -1) {
+            const groupToJoin = groups.find(group => group.groupname === selectedGroup);
+            if (!groupToJoin) {
                 alert("Group not found.");
                 return;
             }
 
-            const group = groups[groupIndex];
-            if (group.members.includes(email)) {
+            if (groupToJoin.members.includes(email)) {
                 alert(`You have already joined the group: ${selectedGroup}`);
                 return;
             }
 
-            group.members.push(email);
-            const updatedGroups = [...groups];
-            updatedGroups[groupIndex] = group;
+            groupToJoin.members.push(email);
+            const updatedGroups = groups.map(group => 
+                group.groupname === selectedGroup ? groupToJoin : group
+            );
+
             sessionStorage.setItem("groups", JSON.stringify(updatedGroups));
             setGroups(updatedGroups);
             alert(`Successfully joined group: ${selectedGroup}`);
@@ -400,6 +400,30 @@ const Group = () => {
                         </>
                     )}
                 </form>
+            )}
+
+            {action === 'invite' && (
+                <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', margin: 'auto' }}>
+                    <label style={{ marginTop: '10px', fontWeight: 'bold' }}>Enter Email:</label>
+                    <input 
+                        type="email" 
+                        value={inviteEmail} 
+                        onChange={(e) => setInviteEmail(e.target.value)} 
+                        required 
+                        autoComplete="email"
+                        style={{ padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '5px' }} 
+                    />
+
+                    <label style={{ marginTop: '10px', fontWeight: 'bold' }}>Select Group:</label>
+                    <select onChange={(e) => setSelectedGroup(e.target.value)} required style={{ padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                        <option value="">Select a group</option>
+                        {groups.map((group, index) => (
+                            <option key={index} value={group.groupname}>{group.groupname}</option>
+                        ))}
+                    </select>
+
+                    <button onClick={handleInvite} style={{ padding: '10px', background: '#ffc107', color: 'white', border: 'none', borderRadius: '5px', marginTop: '10px', cursor: 'pointer' }}>Send Invitation</button>
+                </div>
             )}
         </div>
     );
