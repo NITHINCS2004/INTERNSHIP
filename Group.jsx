@@ -20,12 +20,23 @@ const Group = () => {
         e.preventDefault();
 
         if (action === 'create') {
+            const existingGroup = groups.find(group => group.groupname === groupname && group.email === email);
+            if (existingGroup) {
+                alert("You have already created this group.");
+                return;
+            }
+
             const newGroup = { groupname, description, email };
             const updatedGroups = [...groups, newGroup];
             sessionStorage.setItem("groups", JSON.stringify(updatedGroups));
             setGroups(updatedGroups);
             alert("Group created successfully!");
         } else if (action === 'join') {
+            const alreadyJoined = groups.find(group => group.groupname === selectedGroup && group.email === email);
+            if (alreadyJoined) {
+                alert(`You have already joined the group: ${selectedGroup}`);
+                return;
+            }
             alert(`Successfully joined group: ${selectedGroup}`);
         }
     };
@@ -35,9 +46,7 @@ const Group = () => {
             const subject = encodeURIComponent("Group Invitation");
             const body = encodeURIComponent(`You have been invited to join the group: ${selectedGroup}`);
 
-            // Correctly formatted mailto link
             window.location.href = `mailto:${inviteEmail.trim()}?subject=${subject}&body=${body}`;
-
             alert(`Invitation sent to ${inviteEmail.trim()}`);
         } else {
             alert("Please enter an email and select a group.");
@@ -143,8 +152,16 @@ const Group = () => {
     const [selectedGroup, setSelectedGroup] = useState("");
 
     useEffect(() => {
-        const storedGroups = JSON.parse(sessionStorage.getItem("groups")) || [];
-        setGroups(storedGroups);
+        const loadGroups = () => {
+            const storedGroups = JSON.parse(sessionStorage.getItem("groups")) || [];
+            setGroups(storedGroups);
+        };
+
+        loadGroups();
+
+        // Listen for sessionStorage changes
+        window.addEventListener("storage", loadGroups);
+        return () => window.removeEventListener("storage", loadGroups);
     }, []);
 
     const handleSubmit = (e) => {
@@ -163,7 +180,7 @@ const Group = () => {
             setGroups(updatedGroups);
             alert("Group created successfully!");
         } else if (action === 'join') {
-            const alreadyJoined = groups.find(group => group.groupname === selectedGroup && group.email === email);
+            const alreadyJoined = groups.some(group => group.groupname === selectedGroup && group.email === email);
             if (alreadyJoined) {
                 alert(`You have already joined the group: ${selectedGroup}`);
                 return;
@@ -176,7 +193,6 @@ const Group = () => {
         if (inviteEmail.trim() && selectedGroup) {
             const subject = encodeURIComponent("Group Invitation");
             const body = encodeURIComponent(`You have been invited to join the group: ${selectedGroup}`);
-
             window.location.href = `mailto:${inviteEmail.trim()}?subject=${subject}&body=${body}`;
             alert(`Invitation sent to ${inviteEmail.trim()}`);
         } else {
