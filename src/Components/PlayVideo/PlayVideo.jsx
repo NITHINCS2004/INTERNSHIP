@@ -399,8 +399,7 @@ const PlayVideo = ({ videoId }) => {
 
 export default PlayVideo;
 
-*/
-import React, { useEffect, useState } from 'react';
+*/import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
 import like from '../../assets/like.png';
 import dislike from '../../assets/dislike.png';
@@ -416,6 +415,9 @@ const PlayVideo = ({ videoId }) => {
     const [isPremium, setIsPremium] = useState(false);
     const [downloadDate, setDownloadDate] = useState(null);
     const [freeDownloadUsed, setFreeDownloadUsed] = useState(false);
+
+    // Theme state
+    const [currentTheme, setCurrentTheme] = useState('light');
 
     useEffect(() => {
         const storedPremium = localStorage.getItem("isPremium");
@@ -439,6 +441,35 @@ const PlayVideo = ({ videoId }) => {
             setFreeDownloadUsed(false);
             localStorage.removeItem("freeDownloadUsed"); // Reset free download flag
         }
+    }, []);
+
+    // Theme Logic
+    useEffect(() => {
+        const applyTheme = () => {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12; // Convert to 12-hour format
+
+            // Apply white theme between 10:00 AM and 11:59 AM
+            if (hours >= 10 && hours < 12 && ampm === "AM") {
+                document.body.classList.remove("dark-theme");
+                document.body.classList.add("white-theme");
+                setCurrentTheme('white');
+            } else {
+                document.body.classList.remove("white-theme");
+                document.body.classList.add("dark-theme");
+                setCurrentTheme('dark');
+            }
+        };
+
+        applyTheme();
+
+        // Optionally, you can set an interval to check the time every minute
+        const interval = setInterval(applyTheme, 60000); // Check every minute
+
+        return () => clearInterval(interval); // Cleanup interval on component unmount
     }, []);
 
     const fetchVideoData = async () => {
@@ -547,52 +578,43 @@ const PlayVideo = ({ videoId }) => {
         paymentObject.open();
     };
 
-    // Theme Logic
-    useEffect(() => {
-        const applyTheme = () => {
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let ampm = hours >= 12 ? "PM" : "AM";
-            hours = hours % 12 || 12; // Convert to 12-hour format
+    // Inline styles based on theme
+    const themeStyles = {
+        backgroundColor: currentTheme === 'dark' ? '#181818' : '#ffffff',
+        color: currentTheme === 'dark' ? '#fff' : '#000',
+    };
 
-            // Apply white theme between 10:00 AM and 11:59 AM
-            if (hours >= 10 && hours < 12 && ampm === "AM") {
-                document.body.classList.remove("dark-theme");
-                document.body.classList.add("white-theme");
-            } else {
-                document.body.classList.remove("white-theme");
-                document.body.classList.add("dark-theme");
-            }
-        };
+    const buttonStyles = {
+        backgroundColor: currentTheme === 'dark' ? '#cc0000' : '#ff0000',
+        color: '#fff',
+        cursor: 'pointer',
+    };
 
-        applyTheme();
-
-        // Optionally, you can set an interval to check the time every minute
-        const interval = setInterval(applyTheme, 60000); // Check every minute
-
-        return () => clearInterval(interval); // Cleanup interval on component unmount
-    }, []);
+    const paymentButtonStyles = {
+        backgroundColor: '#00cc00',
+        color: '#fff',
+        cursor: 'pointer',
+    };
 
     return (
-        <div className="play-video">
+        <div className="play-video" style={themeStyles}>
             <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
 
             <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
 
-            <div className="play-video-info">
+            <div className="play-video-info" style={themeStyles}>
                 <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
                 <div>
                     <button
                         onClick={handleDownload}
-                        style={{ backgroundColor: "#ff0000", cursor: "pointer", color: "#fff" }}
+                        style={buttonStyles}
                     >
                         Download
                     </button>
                     {!isPremium && (
                         <button
                             onClick={handlePayment}
-                            style={{ backgroundColor: "#00cc00", cursor: "pointer", color: "#fff" }}
+                            style={paymentButtonStyles}
                         >
                             Pay ₹1
                         </button>
@@ -604,20 +626,20 @@ const PlayVideo = ({ videoId }) => {
                 </div>
             </div>
 
-            <div className="publisher">
+            <div className="publisher" style={themeStyles}>
                 <img src={channelData ? channelData.snippet.thumbnails.default.url : ""} alt="" />
                 <div>
                     <p>{apiData ? apiData.snippet.channelTitle : ""}</p>
                     <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
                 </div>
-                <button type="button">Subscribe</button>
+                <button type="button" style={buttonStyles}>Subscribe</button>
             </div>
 
-            <div className="comments">
+            <div className="comments" style={themeStyles}>
                 <h4>Comments</h4>
                 {commentData.length > 0 ? (
                     commentData.map((comment, index) => (
-                        <div key={index} className="comment">
+                        <div key={index} className="comment" style={themeStyles}>
                             <img src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="User" />
                             <div>
                                 <h5>{comment.snippet.topLevelComment.snippet.authorDisplayName}</h5>
