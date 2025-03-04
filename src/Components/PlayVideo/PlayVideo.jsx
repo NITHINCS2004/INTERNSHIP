@@ -190,7 +190,6 @@ const PlayVideo = ({ videoId }) => {
 
 export default PlayVideo;  
 */
-
 import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
 import like from '../../assets/like.png';
@@ -206,19 +205,30 @@ const PlayVideo = ({ videoId }) => {
     const [commentData, setCommentData] = useState([]);
     const [isPremium, setIsPremium] = useState(false);
     const [downloadDate, setDownloadDate] = useState(null);
+    const [freeDownloadUsed, setFreeDownloadUsed] = useState(false);
 
     useEffect(() => {
         const storedPremium = localStorage.getItem("isPremium");
         const storedDate = localStorage.getItem("downloadDate");
+        const storedFreeUsed = localStorage.getItem("freeDownloadUsed");
+
         const today = new Date().toISOString().split('T')[0];
 
         if (storedPremium === "true" && storedDate === today) {
-            setIsPremium(true); // Allow unlimited downloads for today
+            setIsPremium(true);
         } else {
-            setIsPremium(false); // Reset for a new day
+            setIsPremium(false);
+            localStorage.removeItem("isPremium"); // Reset premium if it's a new day
         }
 
-        if (storedDate) setDownloadDate(storedDate);
+        if (storedDate === today) {
+            setDownloadDate(today);
+            setFreeDownloadUsed(storedFreeUsed === "true");
+        } else {
+            setDownloadDate(null);
+            setFreeDownloadUsed(false);
+            localStorage.removeItem("freeDownloadUsed"); // Reset free download flag
+        }
     }, []);
 
     const fetchVideoData = async () => {
@@ -254,8 +264,12 @@ const PlayVideo = ({ videoId }) => {
         const today = new Date().toISOString().split('T')[0];
 
         if (!isPremium) {
-            alert("Please make a payment to download videos today.");
-            return;
+            if (freeDownloadUsed) {
+                alert("You have already downloaded a free video today. Please make a payment to download more.");
+                return;
+            }
+            localStorage.setItem('freeDownloadUsed', "true");
+            setFreeDownloadUsed(true);
         }
 
         localStorage.setItem('downloadDate', today);
@@ -304,13 +318,10 @@ const PlayVideo = ({ videoId }) => {
             image: "https://example.com/your_logo.png",
             handler: function (response) {
                 alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                const today = new Date().toISOString().split('T')[0];
-
                 localStorage.setItem("isPremium", "true");
-                localStorage.setItem("downloadDate", today);
-                
-                setIsPremium(true); // Allow unlimited downloads for today
-                setDownloadDate(today);
+                localStorage.setItem("downloadDate", new Date().toISOString().split('T')[0]);
+                setIsPremium(true);
+                setDownloadDate(new Date().toISOString().split('T')[0]);
             },
             prefill: {
                 name: "John Doe",
