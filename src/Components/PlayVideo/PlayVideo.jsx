@@ -1,221 +1,4 @@
-/*import React, { useEffect, useState } from 'react'
-import './PlayVideo.css'
-import like from '../../assets/like.png'
-import dislike from '../../assets/dislike.png'
-import share from '../../assets/share.png'
-import save from '../../assets/save.png'
-import { API_KEY, value_converter } from '../../data'
-import moment from 'moment'
-
-const PlayVideo = ({ videoId }) => {
-
-    const [apiData, setApiData] = useState(null);
-    const [channelData, setChannelData] = useState(null);
-    const [commentData, setCommentData] = useState([]);
-
-    const fetchVideoData = async () => {
-
-        // Fetching Video Data
-        const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&key=${API_KEY}&id=${videoId}`;
-        await fetch(videoDetails_url).then(res => res.json()).then(data => setApiData(data.items[0]));
-    }
-
-    const fetchOtherData = async () => {
-
-        // Fetching Channel Data
-        const channelLogo_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${apiData.snippet.channelId}&key=${API_KEY}`;
-        await fetch(channelLogo_url).then(res => res.json()).then(data => setChannelData(data.items[0]));
-
-        // Fetching Comment Data
-        const videoComment_url = `https://www.googleapis.com/youtube/v3/commentThreads?textFormat=plainText&part=snippet&maxResults=50&key=${API_KEY}&videoId=${videoId}`;
-        await fetch(videoComment_url).then(res => res.json()).then(data => setCommentData(data.items));
-
-    }
-
-    useEffect(() => {
-        fetchVideoData();
-        window.scrollTo(0, 0);
-    }, [])
-
-    useEffect(() => {
-        fetchOtherData();
-    }, [apiData])
-
-    return (
-        <div className="play-video">
-            <iframe src={`https://www.youtube.com/embed/${videoId}?&autoplay=1`} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-            
-            <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
-            <div className="play-video-info">
-                <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views  &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
-                <div>
-                    <span><img src={like} alt="" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
-                    <span><img src={dislike} alt="" />2</span>
-                    <span><img src={share} alt="" />Share</span>
-                    <span><img src={save} alt="" />Save</span>
-                </div>
-            </div>
-            <hr />
-            <div className="publisher">
-                <img src={channelData ? value_converter(channelData.snippet.thumbnails.default.url) : ""} alt="" />
-                <div>
-                    
-                    <p>{apiData ? apiData.snippet.channelTitle : ""}</p>
-                    
-                    <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
-                </div>
-                <button type="button">Subscribe</button>
-            </div>
-            <div className="vid-description">
-                
-                <p>{apiData ? apiData.snippet.description.slice(0, 250) : "Description Here"}</p>
-                <hr />
-               
-                <h4>{apiData ? value_converter(apiData.statistics.commentCount) : 130} Comments</h4>
-
-                {commentData.map((item, index) => {
-                    return (
-                        <div key={index} className="comment">
-                            <img src={item.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="" />
-                            <div>
-                                <h3>{item.snippet.topLevelComment.snippet.authorDisplayName} <span>{moment(item.snippet.topLevelComment.snippet.publishedAt).fromNow()}</span></h3>
-                                <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
-                                <div className="comment-action">
-                                    <img src={like} alt="" />
-                                    <span>{item.snippet.topLevelComment.snippet.likeCount}</span>
-                                    <img src={dislike} alt="" />
-                                </div>
-                            </div>
-                        </div>
-                    )
-                })}
-                
-            </div>
-
-        </div>
-    )
-}
-
-export default PlayVideo
-*/
 /*
-import React, { useEffect, useState } from 'react';
-import './PlayVideo.css';
-import like from '../../assets/like.png';
-import dislike from '../../assets/dislike.png';
-import share from '../../assets/share.png';
-import save from '../../assets/save.png';
-import { API_KEY, value_converter } from '../../data';
-import moment from 'moment';
-
-const PlayVideo = ({ videoId }) => {
-    const [apiData, setApiData] = useState(null);
-    const [channelData, setChannelData] = useState(null);
-    const [commentData, setCommentData] = useState([]);
-
-    // Determine current time theme
-    const currentHour = new Date().getHours();
-    const isWhiteTheme = currentHour >= 10 && currentHour < 12;
-
-    const fetchVideoData = async () => {
-        const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&key=${API_KEY}&id=${videoId}`;
-        await fetch(videoDetails_url)
-            .then(res => res.json())
-            .then(data => setApiData(data.items[0]));
-    };
-
-    const fetchOtherData = async () => {
-        if (!apiData) return;
-        const channelLogo_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${apiData.snippet.channelId}&key=${API_KEY}`;
-        await fetch(channelLogo_url)
-            .then(res => res.json())
-            .then(data => setChannelData(data.items[0]));
-
-        const videoComment_url = `https://www.googleapis.com/youtube/v3/commentThreads?textFormat=plainText&part=snippet&maxResults=50&key=${API_KEY}&videoId=${videoId}`;
-        await fetch(videoComment_url)
-            .then(res => res.json())
-            .then(data => setCommentData(data.items));
-    };
-
-    useEffect(() => {
-        fetchVideoData();
-        window.scrollTo(0, 0);
-    }, []);
-
-    useEffect(() => {
-        fetchOtherData();
-    }, [apiData]);
-
-    return (
-        <div 
-            className="play-video" 
-            style={{
-                backgroundColor: isWhiteTheme ? '#ffffff' : '#181818',
-                color: isWhiteTheme ? '#000000' : '#ffffff'
-            }}
-        >
-            <iframe 
-                src={`https://www.youtube.com/embed/${videoId}?&autoplay=1`} 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowFullScreen
-            ></iframe>
-
-            <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
-            
-            <div className="play-video-info">
-                <p>
-                    {apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; 
-                    {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}
-                </p>
-                <div>
-                    <span><img src={like} alt="" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
-                    <span><img src={dislike} alt="" />2</span>
-                    <span><img src={share} alt="" />Share</span>
-                    <span><img src={save} alt="" />Save</span>
-                </div>
-            </div>
-
-            <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
-
-            <div className="publisher">
-                <img src={channelData ? channelData.snippet.thumbnails.default.url : ""} alt="" />
-                <div>
-                    <p>{apiData ? apiData.snippet.channelTitle : ""}</p>
-                    <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
-                </div>
-                <button type="button">Subscribe</button>
-            </div>
-
-            <div className="vid-description">
-                <p>{apiData ? apiData.snippet.description.slice(0, 250) : "Description Here"}</p>
-                <hr style={{ backgroundColor: isWhiteTheme ? '#ccc' : '#333' }} />
-                <h4>{apiData ? value_converter(apiData.statistics.commentCount) : 130} Comments</h4>
-
-                {commentData.map((item, index) => (
-                    <div key={index} className="comment">
-                        <img src={item.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="" />
-                        <div>
-                            <h3>{item.snippet.topLevelComment.snippet.authorDisplayName} 
-                                <span> {moment(item.snippet.topLevelComment.snippet.publishedAt).fromNow()}</span>
-                            </h3>
-                            <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
-                            <div className="comment-action">
-                                <img src={like} alt="" />
-                                <span>{item.snippet.topLevelComment.snippet.likeCount}</span>
-                                <img src={dislike} alt="" />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-export default PlayVideo;
-
-*/
 
 import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
@@ -270,18 +53,7 @@ const PlayVideo = ({ videoId }) => {
         fetchOtherData();
     }, [apiData]);
 
-    /*const handleDownload = () => {
-        const today = new Date().toISOString().split('T')[0]; // Get current date (YYYY-MM-DD)
-
-        if (!isPremium && downloadDate === today) {
-            alert("You have already downloaded a video today. Please make a payment to download again.");
-            return;
-        }
-
-        localStorage.setItem('downloadDate', today);
-        setDownloadDate(today);
-        alert("Video downloaded successfully!");
-    };*/
+    
     const handleDownload = () => {
         const today = new Date().toISOString().split('T')[0]; // Get current date (YYYY-MM-DD)
 
@@ -418,3 +190,150 @@ const PlayVideo = ({ videoId }) => {
 };
 
 export default PlayVideo;  
+*/
+import React, { useEffect, useState } from 'react';
+import './PlayVideo.css';
+import like from '../../assets/like.png';
+import dislike from '../../assets/dislike.png';
+import share from '../../assets/share.png';
+import save from '../../assets/save.png';
+import { API_KEY, value_converter } from '../../data';
+import moment from 'moment';
+
+const PlayVideo = ({ videoId }) => {
+    const [apiData, setApiData] = useState(null);
+    const [channelData, setChannelData] = useState(null);
+    const [commentData, setCommentData] = useState([]);
+    const [isPremium, setIsPremium] = useState(false);
+    const [downloadDate, setDownloadDate] = useState(null);
+
+    useEffect(() => {
+        const storedPremium = localStorage.getItem("isPremium");
+        const storedDate = localStorage.getItem("downloadDate");
+        
+        if (storedPremium === "true") setIsPremium(true);
+        if (storedDate) {
+            const lastDownloadDate = new Date(storedDate);
+            const currentDate = new Date();
+            
+            if (currentDate - lastDownloadDate >= 24 * 60 * 60 * 1000) {
+                setIsPremium(false);
+                localStorage.removeItem("isPremium");
+            }
+            setDownloadDate(storedDate);
+        }
+    }, []);
+
+    const handleDownload = () => {
+        if (!isPremium) {
+            alert("Please make a payment to download multiple videos.");
+            return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        localStorage.setItem('downloadDate', today);
+        setDownloadDate(today);
+
+        const downloadedVideos = JSON.parse(localStorage.getItem('downloadedVideos')) || [];
+        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+        if (!downloadedVideos.includes(videoUrl)) {
+            downloadedVideos.push(videoUrl);
+            localStorage.setItem('downloadedVideos', JSON.stringify(downloadedVideos));
+        }
+
+        alert("Video downloaded successfully!");
+    };
+
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handlePayment = async () => {
+        const res = await loadRazorpayScript();
+
+        if (!res) {
+            alert("Failed to load Razorpay. Check your internet connection.");
+            return;
+        }
+
+        const options = {
+            key: "rzp_live_sDDQtMTi6CD1HY",
+            amount: 100,
+            currency: "INR",
+            name: "Your Business Name",
+            description: "Payment for ₹1",
+            image: "https://example.com/your_logo.png",
+            handler: function (response) {
+                alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                localStorage.setItem("isPremium", "true");
+                setIsPremium(true);
+            },
+            prefill: {
+                name: "John Doe",
+                email: "johndoe@example.com",
+                contact: "9999999999"
+            },
+            theme: {
+                color: "#3399cc"
+            }
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
+    };
+
+    useEffect(() => {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+        const isBetween10AMand12PM = hours === 10 || (hours === 11 && ampm === 'AM');
+    
+        document.body.classList.toggle('light-theme', isBetween10AMand12PM);
+        document.body.classList.toggle('dark-theme', !isBetween10AMand12PM);
+    }, []);
+    
+
+    return (
+        <div className="play-video">
+            <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
+
+            <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
+
+            <div className="play-video-info">
+                <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
+                <div>
+                    <button
+                        onClick={handleDownload}
+                        style={{ backgroundColor: "#ff0000", cursor: "pointer", color: "#fff" }}
+                    >
+                        Download
+                    </button>
+                    {!isPremium && (
+                        <button
+                            onClick={handlePayment}
+                            style={{ backgroundColor: "#00cc00", cursor: "pointer", color: "#fff" }}
+                        >
+                            Pay ₹1
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default PlayVideo;
