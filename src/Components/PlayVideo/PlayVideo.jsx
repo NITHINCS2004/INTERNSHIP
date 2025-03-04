@@ -190,6 +190,7 @@ const PlayVideo = ({ videoId }) => {
 
 export default PlayVideo;  
 */
+/*
 import React, { useEffect, useState } from 'react';
 import './PlayVideo.css';
 import like from '../../assets/like.png';
@@ -360,6 +361,135 @@ const PlayVideo = ({ videoId }) => {
                             Pay ₹1
                         </button>
                     )}
+                    <span><img src={like} alt="like" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
+                    <span><img src={dislike} alt="dislike" />2</span>
+                    <span><img src={share} alt="share" />Share</span>
+                    <span><img src={save} alt="save" />Save</span>
+                </div>
+            </div>
+
+            <div className="publisher">
+                <img src={channelData ? channelData.snippet.thumbnails.default.url : ""} alt="" />
+                <div>
+                    <p>{apiData ? apiData.snippet.channelTitle : ""}</p>
+                    <span>{channelData ? value_converter(channelData.statistics.subscriberCount) : "1M"} Subscribers</span>
+                </div>
+                <button type="button">Subscribe</button>
+            </div>
+
+            <div className="comments">
+                <h4>Comments</h4>
+                {commentData.length > 0 ? (
+                    commentData.map((comment, index) => (
+                        <div key={index} className="comment">
+                            <img src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="User" />
+                            <div>
+                                <h5>{comment.snippet.topLevelComment.snippet.authorDisplayName}</h5>
+                                <p>{comment.snippet.topLevelComment.snippet.textDisplay}</p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p>No comments available.</p>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default PlayVideo;
+*/import React, { useEffect, useState } from 'react';
+import './PlayVideo.css';
+import like from '../../assets/like.png';
+import dislike from '../../assets/dislike.png';
+import share from '../../assets/share.png';
+import save from '../../assets/save.png';
+import { API_KEY, value_converter } from '../../data';
+import moment from 'moment';
+
+const PlayVideo = ({ videoId }) => {
+    const [apiData, setApiData] = useState(null);
+    const [channelData, setChannelData] = useState(null);
+    const [commentData, setCommentData] = useState([]);
+    const [isPremium, setIsPremium] = useState(false);
+    const [downloadDate, setDownloadDate] = useState(null);
+    const [freeDownloadUsed, setFreeDownloadUsed] = useState(false);
+
+    useEffect(() => {
+        const applyTheme = () => {
+            const now = new Date();
+            let hours = now.getHours();
+            let ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
+
+            if (hours >= 10 && hours < 12 && ampm === "AM") {
+                document.body.classList.remove("dark-theme");
+                document.body.classList.add("white-theme");
+            } else {
+                document.body.classList.remove("white-theme");
+                document.body.classList.add("dark-theme");
+            }
+        };
+
+        applyTheme();
+    }, []);
+
+    useEffect(() => {
+        const storedPremium = localStorage.getItem("isPremium");
+        const storedDate = localStorage.getItem("downloadDate");
+        const storedFreeUsed = localStorage.getItem("freeDownloadUsed");
+
+        const today = new Date().toISOString().split('T')[0];
+
+        setIsPremium(storedPremium === "true" && storedDate === today);
+        setDownloadDate(storedDate === today ? today : null);
+        setFreeDownloadUsed(storedFreeUsed === "true" && storedDate === today);
+    }, []);
+
+    useEffect(() => {
+        const fetchVideoData = async () => {
+            const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&key=${API_KEY}&id=${videoId}`;
+            const res = await fetch(videoDetails_url);
+            const data = await res.json();
+            setApiData(data.items[0]);
+        };
+
+        fetchVideoData();
+        window.scrollTo(0, 0);
+    }, [videoId]);
+
+    useEffect(() => {
+        if (!apiData) return;
+
+        const fetchOtherData = async () => {
+            const channelLogo_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${apiData.snippet.channelId}&key=${API_KEY}`;
+            const channelRes = await fetch(channelLogo_url);
+            const channelData = await channelRes.json();
+            setChannelData(channelData.items[0]);
+
+            const videoComment_url = `https://www.googleapis.com/youtube/v3/commentThreads?textFormat=plainText&part=snippet&maxResults=50&key=${API_KEY}&videoId=${videoId}`;
+            const commentRes = await fetch(videoComment_url);
+            const commentData = await commentRes.json();
+            setCommentData(commentData.items || []);
+        };
+
+        fetchOtherData();
+    }, [apiData, videoId]);
+
+    return (
+        <div className="play-video">
+            <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                frameBorder="0"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+            ></iframe>
+
+            <h3>{apiData ? apiData.snippet.title : "Title Here"}</h3>
+
+            <div className="play-video-info">
+                <p>{apiData ? value_converter(apiData.statistics.viewCount) : 1525} Views &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : "2 days ago"}</p>
+                <div>
                     <span><img src={like} alt="like" />{apiData ? value_converter(apiData.statistics.likeCount) : 125}</span>
                     <span><img src={dislike} alt="dislike" />2</span>
                     <span><img src={share} alt="share" />Share</span>
