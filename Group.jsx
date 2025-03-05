@@ -456,7 +456,7 @@ const Group = () => {
             hours = hours % 12 || 12; // Convert to 12-hour format
 
             // Apply white theme between 10:00 AM and 11:59 AM
-            if (hours >= 10 && hours < 12 && ampm === "AM") {
+            if (hours >= 7 && hours < 12 && ampm === "AM") {
                 setCurrentTheme("light");
             } else {
                 setCurrentTheme("dark");
