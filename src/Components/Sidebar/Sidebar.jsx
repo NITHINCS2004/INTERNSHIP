@@ -397,6 +397,7 @@ const Sidebar = ({ sidebar, category, setCategory }) => {
 
 export default Sidebar;
 */
+
 import React, { useEffect, useState } from "react";
 import "./Sidebar.css";
 import home from "../../assets/home.png";
@@ -426,7 +427,7 @@ const Sidebar = ({ sidebar, category, setCategory }) => {
       hours = hours % 12 || 12; // Convert to 12-hour format
 
       // Apply white theme between 10:00 AM and 11:59 AM
-      if (hours >= 10 && hours < 11 && ampm === "AM") {
+      if (hours >= 10 && hours < 12 && ampm === "AM") {
         setCurrentTheme("white");
       } else {
         setCurrentTheme("dark");
