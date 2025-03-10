@@ -394,7 +394,7 @@ const Navbar = ({ setSidebar }) => {
             setTimePeriod(isPM ? "PM" : "AM");
 
             // Theme logic based on time only
-            setTheme(currentHour >= 10 && currentHour < 12 ? "light" : "dark");
+            setTheme(currentHour >= 11 && currentHour < 12 ? "light" : "dark");
         };
 
         updateThemeAndTime(); // Apply theme immediately
