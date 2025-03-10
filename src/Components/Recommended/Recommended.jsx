@@ -113,7 +113,7 @@ const Recommended = ({ categoryId }) => {
     useEffect(() => {
         const applyTheme = () => {
             const currentHour = new Date().getHours();
-            const isWhite = currentHour >= 11 && currentHour < 12;
+            const isWhite = currentHour >= 10 && currentHour < 11;
             setIsWhiteTheme(isWhite);
         };
 

@@ -179,7 +179,7 @@ const Feed = ({ category }) => {
       const isAM = hours < 12;
 
       // Apply Light theme only between 10 AM - 12 PM
-      if (isAM && hours >= 11 && hours < 12) {
+      if (isAM && hours >= 10 && hours < 11) {
         setTheme("light");
       } else {
         setTheme("dim-dark");
